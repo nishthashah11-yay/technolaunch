@@ -23,3 +23,11 @@ scipy
 rocket
 jinja2
 uvloop
+streamlit 
+pandas 
+numpy 
+plotly.express 
+plotly.graph_objects
+seaborn 
+matplotlib.pyplot 
+
