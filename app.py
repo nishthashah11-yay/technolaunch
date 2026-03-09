@@ -41,9 +41,34 @@ st.write("Mathematics for AI – Space Mission Data Analysis & Rocket Simulation
 # LOAD DATA
 # ==================================================
 
+# ==================================================
+# DATA LOADING (FIXED FOR STREAMLIT CLOUD)
+# ==================================================
+
 @st.cache_data
 def load_data():
-    df = pd.read_csv("space_missions.csv")
+
+    try:
+        df = pd.read_csv("space_missions.csv")
+
+    except FileNotFoundError:
+
+        st.warning("space_missions.csv not found. Using sample dataset.")
+
+        df = pd.DataFrame({
+            "Launch Date": pd.date_range(start="2020-01-01", periods=20),
+            "Mission Type": np.random.choice(["Orbital","Lunar","Mars","Satellite"],20),
+            "Launch Vehicle": np.random.choice(["Falcon 9","Atlas V","Soyuz","Ariane 5"],20),
+            "Distance from Earth": np.random.randint(200,100000,20),
+            "Mission Duration": np.random.randint(1,400,20),
+            "Mission Cost": np.random.randint(50,500,20),
+            "Scientific Yield": np.random.randint(10,100,20),
+            "Crew Size": np.random.randint(0,7,20),
+            "Fuel Consumption": np.random.randint(500,5000,20),
+            "Payload Weight": np.random.randint(100,2000,20),
+            "Mission Success": np.random.choice(["Success","Failure"],20)
+        })
+
     return df
 
 
