@@ -1,7 +1,6 @@
 # ============================================================
 # 🚀 Rocket Mission Visualizer
-# IDAI104 Generative AI Project
-# Student: Jashith Hemendra Rathod
+# Generative AI Project
 # ============================================================
 
 import streamlit as st
@@ -10,8 +9,6 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 import time
-import math
-from datetime import datetime
 
 # ============================================================
 # PAGE CONFIG
@@ -24,7 +21,7 @@ st.set_page_config(
 )
 
 # ============================================================
-# SESSION STATE INITIALIZATION
+# SESSION STATE
 # ============================================================
 
 if "page" not in st.session_state:
@@ -34,32 +31,27 @@ if "user" not in st.session_state:
     st.session_state.user = None
 
 # ============================================================
-# CUSTOM CSS (GLASSMORPHISM + NEON STYLE)
+# CUSTOM CSS
 # ============================================================
 
 st.markdown("""
 <style>
 
-body {
-background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-}
-
-.title {
-font-size:48px;
+.title{
+font-size:50px;
 font-weight:700;
 text-align:center;
-background:linear-gradient(90deg,#00ffd5,#7effff);
+background:linear-gradient(90deg,#00ffd5,#00aaff);
 -webkit-background-clip:text;
 color:transparent;
 }
 
-.glass-container{
+.glass{
 background:rgba(255,255,255,0.05);
-padding:30px;
+padding:25px;
 border-radius:15px;
 border:1px solid rgba(255,255,255,0.1);
-backdrop-filter:blur(12px);
-margin-top:20px;
+backdrop-filter:blur(10px);
 }
 
 .metric-card{
@@ -70,30 +62,10 @@ text-align:center;
 border:1px solid rgba(255,255,255,0.1);
 }
 
-.metric-label{
-font-size:14px;
-color:#bbbbbb;
-}
-
 .metric-value{
 font-size:28px;
 font-weight:600;
 color:#00ffd5;
-}
-
-.neon-btn button{
-background:linear-gradient(90deg,#00ffd5,#00aaff);
-border:none;
-border-radius:30px;
-padding:10px 25px;
-font-weight:600;
-}
-
-.glow-header{
-font-size:22px;
-font-weight:600;
-color:#00ffd5;
-margin-bottom:10px;
 }
 
 </style>
@@ -105,30 +77,13 @@ margin-bottom:10px;
 
 if st.session_state.page == "splash":
 
-    st.markdown(
-        """
-        <h1 class='title'>🚀 Rocket Mission Visualizer</h1>
-        """,
-        unsafe_allow_html=True
-    )
-
-    st.markdown(
-        """
-        <div class='glass-container'>
-        Welcome to the Rocket Mission Visualizer platform.
-        This system analyzes space mission datasets,
-        performs rocket physics simulations,
-        and visualizes mission trends using interactive graphs.
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown("<h1 class='title'>Rocket Mission Visualizer 🚀</h1>", unsafe_allow_html=True)
 
     progress = st.progress(0)
 
     for i in range(100):
-        time.sleep(0.02)
-        progress.progress(i + 1)
+        time.sleep(0.01)
+        progress.progress(i+1)
 
     st.session_state.page = "landing"
     st.rerun()
@@ -139,35 +94,17 @@ if st.session_state.page == "splash":
 
 if st.session_state.page == "landing":
 
-    st.markdown(
-        """
-        <h1 class='title'>Rocket Mission Visualizer 🚀</h1>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown("<h1 class='title'>Rocket Mission Visualizer 🚀</h1>", unsafe_allow_html=True)
 
-    st.markdown(
-        """
-        <div class='glass-container'>
-        Explore global space missions, analyze rocket launches,
-        and simulate rocket trajectories using physics-based models.
+    st.markdown("""
+    <div class="glass">
+    Explore global space missions and simulate rocket physics.
+    </div>
+    """, unsafe_allow_html=True)
 
-        Features:
-        • Interactive mission dataset explorer  
-        • Rocket physics simulations  
-        • Mission analytics dashboard  
-        • AI-powered insights
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    col1, col2, col3 = st.columns([1,2,1])
-
-    with col2:
-        if st.button("🚀 Get Started"):
-            st.session_state.page = "signup"
-            st.rerun()
+    if st.button("Get Started 🚀"):
+        st.session_state.page = "signup"
+        st.rerun()
 
 # ============================================================
 # SIGNUP PAGE
@@ -175,14 +112,7 @@ if st.session_state.page == "landing":
 
 if st.session_state.page == "signup":
 
-    st.markdown(
-        """
-        <h1 class='title'>Create Account</h1>
-        """,
-        unsafe_allow_html=True
-    )
-
-    st.markdown("<div class='glass-container'>", unsafe_allow_html=True)
+    st.markdown("<h1 class='title'>Create Account</h1>", unsafe_allow_html=True)
 
     username = st.text_input("Username")
     email = st.text_input("Email")
@@ -194,17 +124,13 @@ if st.session_state.page == "signup":
 
             st.session_state.user = username
             st.session_state.page = "dashboard"
-            st.success("Account created successfully!")
-            time.sleep(1)
             st.rerun()
 
         else:
             st.error("Please fill all fields")
 
-    st.markdown("</div>", unsafe_allow_html=True)
-
 # ============================================================
-# DATASET LOADING
+# DATA LOADER
 # ============================================================
 
 @st.cache_data
@@ -218,25 +144,24 @@ def load_dataset():
     return df
 
 # ============================================================
-# ROCKET PHYSICS SIMULATION FUNCTION
+# ROCKET SIMULATION
 # ============================================================
 
 def rocket_simulation(thrust, mass, drag, burn_rate, steps=200):
 
     g = 9.81
-
     velocity = 0
     altitude = 0
 
     altitudes = []
     velocities = []
 
-    for i in range(steps):
+    for _ in range(steps):
 
-        acceleration = (thrust - drag - mass * g) / mass
+        acceleration = (thrust - drag - mass*g) / mass
 
-        velocity = velocity + acceleration
-        altitude = altitude + velocity
+        velocity += acceleration
+        altitude += velocity
 
         mass = max(mass - burn_rate, 1)
 
@@ -246,534 +171,244 @@ def rocket_simulation(thrust, mass, drag, burn_rate, steps=200):
     return altitudes, velocities
 
 # ============================================================
-# DASHBOARD PAGE (START)
+# DASHBOARD
 # ============================================================
 
 if st.session_state.page == "dashboard":
 
-    st.markdown(
-        f"""
-        <h1 class='title'>Welcome {st.session_state.user} 🚀</h1>
-        """,
-        unsafe_allow_html=True
-    )
+    st.markdown(f"<h1 class='title'>Welcome {st.session_state.user}</h1>", unsafe_allow_html=True)
 
     df = load_dataset()
 
     if df.empty:
-        st.warning("Dataset not found. Please upload space_missions_dataset.csv")
+        st.error("Dataset not found")
         st.stop()
 
-    st.markdown("<div class='glass-container'>Dataset Loaded Successfully</div>", unsafe_allow_html=True)
-
-
-
-
-
-# ============================================================
-# DATA CLEANING
-# ============================================================
-
-df.columns = df.columns.str.strip()
-
-df = df.drop_duplicates()
-
-df = df.fillna(method="ffill")
-
-# Convert date column if present
-for col in df.columns:
-    if "date" in col.lower():
-        try:
-            df[col] = pd.to_datetime(df[col])
-        except:
-            pass
-
-# ============================================================
-# FEATURE ENGINEERING
-# ============================================================
-
-numeric_cols = df.select_dtypes(include=np.number).columns
-
-df["Mission_Index"] = np.arange(len(df))
-
-df["Success_Flag"] = df.get("Mission_Status", "").astype(str).str.contains("Success", case=False)
-
-df["Success_Flag"] = df["Success_Flag"].astype(int)
-
-# ============================================================
-# BASIC DATASET STATS
-# ============================================================
-
-total_missions = len(df)
-
-success_rate = df["Success_Flag"].mean() * 100
-
-numeric_summary = df[numeric_cols].describe()
-
-# ============================================================
-# SIDEBAR CONTROLS
-# ============================================================
-
-st.sidebar.markdown("## 🚀 Simulation Controls")
-
-payload_weight = st.sidebar.slider(
-    "Payload Weight (kg)",
-    100,
-    10000,
-    2000
-)
-
-rocket_thrust = st.sidebar.slider(
-    "Rocket Thrust (kN)",
-    1000,
-    10000,
-    4000
-)
-
-fuel_amount = st.sidebar.slider(
-    "Fuel Amount (tons)",
-    50,
-    1000,
-    300
-)
-
-drag_coeff = st.sidebar.slider(
-    "Drag Coefficient",
-    0.1,
-    1.5,
-    0.5
-)
-
-burn_rate = st.sidebar.slider(
-    "Fuel Burn Rate",
-    1,
-    50,
-    10
-)
-
-time_steps = st.sidebar.slider(
-    "Simulation Steps",
-    50,
-    500,
-    200
-)
-
-# ============================================================
-# MISSION FILTERS
-# ============================================================
-
-st.sidebar.markdown("## 📊 Mission Filters")
-
-if "Company" in df.columns:
-    company_filter = st.sidebar.selectbox(
-        "Launch Company",
-        ["All"] + sorted(df["Company"].dropna().unique().tolist())
-    )
-else:
-    company_filter = "All"
-
-if "Location" in df.columns:
-    location_filter = st.sidebar.selectbox(
-        "Launch Location",
-        ["All"] + sorted(df["Location"].dropna().unique().tolist())
-    )
-else:
-    location_filter = "All"
-
-# Apply filters
-filtered_df = df.copy()
-
-if company_filter != "All":
-    filtered_df = filtered_df[filtered_df["Company"] == company_filter]
-
-if location_filter != "All":
-    filtered_df = filtered_df[filtered_df["Location"] == location_filter]
-
-# ============================================================
-# DASHBOARD METRICS
-# ============================================================
-
-total_filtered = len(filtered_df)
-
-success_filtered = filtered_df["Success_Flag"].sum()
-
-success_rate_filtered = (success_filtered / total_filtered) * 100 if total_filtered else 0
-
-avg_payload = payload_weight
-
-fuel_efficiency = rocket_thrust / fuel_amount
-
-# ============================================================
-# METRIC CARDS DISPLAY
-# ============================================================
-
-col1, col2, col3, col4 = st.columns(4)
-
-with col1:
-    st.markdown(
-        f"""
-        <div class="metric-card">
-        <div class="metric-label">Total Missions</div>
-        <div class="metric-value">{total_filtered}</div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-with col2:
-    st.markdown(
-        f"""
-        <div class="metric-card">
-        <div class="metric-label">Success Rate</div>
-        <div class="metric-value">{success_rate_filtered:.2f}%</div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-with col3:
-    st.markdown(
-        f"""
-        <div class="metric-card">
-        <div class="metric-label">Payload Weight</div>
-        <div class="metric-value">{avg_payload} kg</div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-with col4:
-    st.markdown(
-        f"""
-        <div class="metric-card">
-        <div class="metric-label">Fuel Efficiency</div>
-        <div class="metric-value">{fuel_efficiency:.2f}</div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-# ============================================================
-# ADDITIONAL METRICS
-# ============================================================
-
-col5, col6, col7, col8 = st.columns(4)
-
-max_payload = payload_weight * 1.5
-mission_cost = rocket_thrust * fuel_amount * 10
-avg_drag = drag_coeff * 100
-estimated_orbit = rocket_thrust / payload_weight
-
-with col5:
-    st.markdown(
-        f"""
-        <div class="metric-card">
-        <div class="metric-label">Max Payload</div>
-        <div class="metric-value">{max_payload:.0f} kg</div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-with col6:
-    st.markdown(
-        f"""
-        <div class="metric-card">
-        <div class="metric-label">Mission Cost</div>
-        <div class="metric-value">${mission_cost:,.0f}</div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-with col7:
-    st.markdown(
-        f"""
-        <div class="metric-card">
-        <div class="metric-label">Drag Impact</div>
-        <div class="metric-value">{avg_drag:.1f}%</div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-with col8:
-    st.markdown(
-        f"""
-        <div class="metric-card">
-        <div class="metric-label">Orbit Potential</div>
-        <div class="metric-value">{estimated_orbit:.2f}</div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-# ============================================================
-# DATA PREVIEW
-# ============================================================
-
-st.markdown("### Mission Dataset Preview")
-
-st.dataframe(filtered_df.head(50))
-
-# ============================================================
-# PREPARE DATA FOR VISUALIZATION
-# ============================================================
-
-numeric_df = filtered_df.select_dtypes(include=np.number)
-
-correlation_matrix = numeric_df.corr()
-
-mission_counts = None
-
-if "Company" in filtered_df.columns:
-    mission_counts = filtered_df["Company"].value_counts().head(10)
-
-location_counts = None
-
-if "Location" in filtered_df.columns:
-    location_counts = filtered_df["Location"].value_counts().head(10)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# ============================================================
-# TAB STRUCTURE
-# ============================================================
-
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
-    "🚀 Simulation",
-    "📊 Scatter Plot",
-    "📉 Line Chart",
-    "📊 Bar Chart",
-    "📦 Box Plot",
-    "🔥 Correlation Heatmap",
-    "⚙ Settings"
-])
-
-# ============================================================
-# TAB 1 — ROCKET SIMULATION
-# ============================================================
-
-with tab1:
-
-    st.subheader("Rocket Trajectory Simulation")
-
-    mass = payload_weight + fuel_amount * 100
-    thrust = rocket_thrust * 1000
-    drag = drag_coeff * 100
-
-    altitudes, velocities = rocket_simulation(
-        thrust,
-        mass,
-        drag,
-        burn_rate,
-        steps=time_steps
-    )
-
-    fig = go.Figure()
-
-    fig.add_trace(
-        go.Scatter(
-            y=altitudes,
-            mode="lines",
-            name="Altitude"
-        )
-    )
-
-    fig.update_layout(
-        title="Altitude vs Time",
-        template="plotly_dark",
-        xaxis_title="Time Step",
-        yaxis_title="Altitude"
-    )
-
-    st.plotly_chart(fig, use_container_width=True)
-
-    fig2 = go.Figure()
-
-    fig2.add_trace(
-        go.Scatter(
-            y=velocities,
-            mode="lines",
-            name="Velocity"
-        )
-    )
-
-    fig2.update_layout(
-        title="Velocity vs Time",
-        template="plotly_dark"
-    )
-
-    st.plotly_chart(fig2, use_container_width=True)
-
-    st.markdown("""
-    **Simulation Insight**
-
-    The rocket trajectory is calculated using Newtonian physics.
-
-    Acceleration = (Thrust − Drag − Gravity) / Mass
-
-    Higher thrust increases altitude potential while higher drag
-    reduces velocity and efficiency.
-    """)
-
-# ============================================================
-# TAB 2 — SCATTER PLOT
-# ============================================================
-
-with tab2:
-
-    st.subheader("Payload vs Mission Index")
-
-    if len(numeric_df.columns) >= 2:
-
-        x_col = numeric_df.columns[0]
-        y_col = numeric_df.columns[1]
-
-        fig = px.scatter(
-            filtered_df,
-            x=x_col,
-            y=y_col,
-            color="Success_Flag",
-            title="Scatter Plot Analysis"
-        )
-
-        fig.update_layout(template="plotly_dark")
-
-        st.plotly_chart(fig, use_container_width=True)
-
+    # ============================================================
+    # DATA CLEANING
+    # ============================================================
+
+    df.columns = df.columns.str.strip()
+    df = df.drop_duplicates()
+    df = df.fillna(method="ffill")
+
+    # ============================================================
+    # SUCCESS FLAG (SAFE)
+    # ============================================================
+
+    status_col = None
+
+    for col in df.columns:
+        if "status" in col.lower():
+            status_col = col
+            break
+
+    if status_col:
+        df["Success_Flag"] = df[status_col].astype(str).str.contains(
+            "success", case=False, na=False
+        ).astype(int)
     else:
-        st.info("Not enough numeric columns for scatter plot")
+        df["Success_Flag"] = 0
 
-# ============================================================
-# TAB 3 — LINE CHART
-# ============================================================
+    # ============================================================
+    # SIDEBAR CONTROLS
+    # ============================================================
 
-with tab3:
+    st.sidebar.title("Simulation Controls")
 
-    st.subheader("Mission Trend Over Time")
+    payload = st.sidebar.slider("Payload Weight (kg)", 100, 10000, 2000)
+    thrust = st.sidebar.slider("Rocket Thrust (kN)", 1000, 10000, 4000)
+    fuel = st.sidebar.slider("Fuel Amount (tons)", 50, 1000, 300)
+    drag = st.sidebar.slider("Drag Coefficient", 0.1, 1.5, 0.5)
+    burn = st.sidebar.slider("Fuel Burn Rate", 1, 50, 10)
+    steps = st.sidebar.slider("Simulation Steps", 50, 500, 200)
 
-    if "Mission_Index" in filtered_df.columns:
+    # ============================================================
+    # METRICS
+    # ============================================================
+
+    total_missions = len(df)
+    success_rate = df["Success_Flag"].mean() * 100
+
+    col1,col2,col3,col4 = st.columns(4)
+
+    with col1:
+        st.markdown(f"""
+        <div class="metric-card">
+        Total Missions
+        <div class="metric-value">{total_missions}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col2:
+        st.markdown(f"""
+        <div class="metric-card">
+        Success Rate
+        <div class="metric-value">{success_rate:.2f}%</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col3:
+        st.markdown(f"""
+        <div class="metric-card">
+        Payload
+        <div class="metric-value">{payload} kg</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col4:
+        efficiency = thrust / fuel
+        st.markdown(f"""
+        <div class="metric-card">
+        Efficiency
+        <div class="metric-value">{efficiency:.2f}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    # ============================================================
+    # TABS
+    # ============================================================
+
+    tab1,tab2,tab3,tab4,tab5,tab6,tab7 = st.tabs([
+        "🚀 Simulation",
+        "📊 Scatter",
+        "📈 Line",
+        "📊 Bar",
+        "📦 Box",
+        "🔥 Heatmap",
+        "⚙ Settings"
+    ])
+
+    # ============================================================
+    # TAB 1 — SIMULATION
+    # ============================================================
+
+    with tab1:
+
+        mass = payload + fuel*100
+        thrust_force = thrust*1000
+        drag_force = drag*100
+
+        altitudes, velocities = rocket_simulation(
+            thrust_force, mass, drag_force, burn, steps
+        )
+
+        fig = go.Figure()
+
+        fig.add_trace(go.Scatter(y=altitudes,name="Altitude"))
+
+        fig.update_layout(template="plotly_dark",title="Altitude vs Time")
+
+        st.plotly_chart(fig,use_container_width=True)
+
+    # ============================================================
+    # TAB 2 — SCATTER
+    # ============================================================
+
+    with tab2:
+
+        numeric = df.select_dtypes(include=np.number)
+
+        if len(numeric.columns)>=2:
+
+            fig = px.scatter(
+                df,
+                x=numeric.columns[0],
+                y=numeric.columns[1],
+                color="Success_Flag"
+            )
+
+            fig.update_layout(template="plotly_dark")
+
+            st.plotly_chart(fig,use_container_width=True)
+
+    # ============================================================
+    # TAB 3 — LINE
+    # ============================================================
+
+    with tab3:
+
+        numeric = df.select_dtypes(include=np.number)
 
         fig = px.line(
-            filtered_df,
-            x="Mission_Index",
-            y=numeric_df.columns[0],
-            title="Mission Metric Trend"
+            df,
+            y=numeric.columns[0]
         )
 
         fig.update_layout(template="plotly_dark")
 
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig,use_container_width=True)
 
-# ============================================================
-# TAB 4 — BAR CHART
-# ============================================================
+    # ============================================================
+    # TAB 4 — BAR
+    # ============================================================
 
-with tab4:
+    with tab4:
 
-    st.subheader("Top Launch Companies")
+        if "Company" in df.columns:
 
-    if mission_counts is not None:
+            counts = df["Company"].value_counts().head(10)
 
-        fig = px.bar(
-            mission_counts,
-            x=mission_counts.index,
-            y=mission_counts.values,
-            title="Launch Frequency by Company"
-        )
+            fig = px.bar(
+                counts,
+                x=counts.index,
+                y=counts.values
+            )
 
-        fig.update_layout(template="plotly_dark")
+            fig.update_layout(template="plotly_dark")
 
-        st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig,use_container_width=True)
 
-# ============================================================
-# TAB 5 — BOX PLOT
-# ============================================================
+    # ============================================================
+    # TAB 5 — BOX
+    # ============================================================
 
-with tab5:
+    with tab5:
 
-    st.subheader("Payload Distribution")
+        numeric = df.select_dtypes(include=np.number)
 
-    if len(numeric_df.columns) > 0:
-
-        fig = px.box(
-            filtered_df,
-            y=numeric_df.columns[0],
-            title="Distribution Analysis"
-        )
+        fig = px.box(df,y=numeric.columns[0])
 
         fig.update_layout(template="plotly_dark")
 
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig,use_container_width=True)
 
-# ============================================================
-# TAB 6 — CORRELATION HEATMAP
-# ============================================================
+    # ============================================================
+    # TAB 6 — HEATMAP
+    # ============================================================
 
-with tab6:
+    with tab6:
 
-    st.subheader("Correlation Heatmap")
+        numeric = df.select_dtypes(include=np.number)
 
-    if len(numeric_df.columns) > 1:
+        corr = numeric.corr()
 
-        fig = px.imshow(
-            correlation_matrix,
-            text_auto=True,
-            aspect="auto",
-            title="Feature Correlation"
-        )
+        fig = px.imshow(corr,text_auto=True)
 
         fig.update_layout(template="plotly_dark")
 
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig,use_container_width=True)
 
-# ============================================================
-# TAB 7 — SETTINGS
-# ============================================================
+    # ============================================================
+    # TAB 7 — SETTINGS
+    # ============================================================
 
-with tab7:
+    with tab7:
 
-    st.subheader("User Settings")
+        if st.button("Sign Out"):
+            st.session_state.page = "landing"
+            st.session_state.user = None
+            st.rerun()
 
-    notifications = st.toggle("Enable Notifications")
-
-    st.write("Notifications:", "Enabled" if notifications else "Disabled")
+    # ============================================================
+    # FEEDBACK
+    # ============================================================
 
     st.divider()
 
-    if st.button("Sign Out"):
+    feedback = st.text_area("Share feedback")
 
-        st.session_state.page = "landing"
-        st.session_state.user = None
-        st.rerun()
+    rating = st.slider("Rate the app",1,5,4)
 
-# ============================================================
-# FEEDBACK SECTION
-# ============================================================
-
-st.divider()
-
-st.subheader("User Feedback")
-
-feedback = st.text_area("Share your experience")
-
-rating = st.slider("Rate the platform", 1, 5, 4)
-
-if st.button("Submit Feedback"):
-
-    st.success("Thank you for your feedback!")
+    if st.button("Submit Feedback"):
+        st.success("Thanks for your feedback!")
