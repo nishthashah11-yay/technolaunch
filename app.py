@@ -343,21 +343,39 @@ if st.session_state.page == "dashboard":
     # TAB 4 — BAR
     # ============================================================
 
-    with tab4:
+    # ============================================================
+# TAB 4 — BAR CHART
+# ============================================================
 
-        if "Company" in df.columns:
+with tab4:
 
-            counts = df["Company"].value_counts().head(10)
+    st.subheader("Top Launch Organizations")
 
-            fig = px.bar(
-                counts,
-                x=counts.index,
-                y=counts.values
-            )
+    company_col = None
 
-            fig.update_layout(template="plotly_dark")
+    # Detect possible company column
+    for col in df.columns:
+        if "company" in col.lower() or "organization" in col.lower():
+            company_col = col
+            break
 
-            st.plotly_chart(fig,use_container_width=True)
+    if company_col:
+
+        counts = df[company_col].value_counts().head(10)
+
+        fig = px.bar(
+            x=counts.index,
+            y=counts.values,
+            labels={"x": "Organization", "y": "Launch Count"},
+            title="Top Launch Organizations"
+        )
+
+        fig.update_layout(template="plotly_dark")
+
+        st.plotly_chart(fig, use_container_width=True)
+
+    else:
+        st.warning("No company/organization column found in dataset.")
 
     # ============================================================
     # TAB 5 — BOX
