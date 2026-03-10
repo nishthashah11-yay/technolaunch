@@ -307,6 +307,9 @@ if st.session_state.page == "dashboard":
 
     with tab2:
 
+        st.subheader("Payload vs Fuel Consumption")
+
+
         numeric = df.select_dtypes(include=np.number)
 
         if len(numeric.columns)>=2:
@@ -327,6 +330,7 @@ if st.session_state.page == "dashboard":
     # ============================================================
 
     with tab3:
+        st.subheader("Mission Duration vs Distance from Earth")
 
         numeric = df.select_dtypes(include=np.number)
 
@@ -373,6 +377,8 @@ with tab4:
     # ============================================================
 
     with tab5:
+        st.subheader("Crew Size vs Mission Success")
+
 
         numeric = df.select_dtypes(include=np.number)
 
@@ -387,6 +393,8 @@ with tab4:
     # ============================================================
 
     with tab6:
+        st.subheader("Heat Map")
+
 
         numeric = df.select_dtypes(include=np.number)
 
