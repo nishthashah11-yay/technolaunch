@@ -31,19 +31,21 @@ if "user" not in st.session_state:
     st.session_state.user = None
 
 # ============================================================
-# RED BLACK UI
+# RED BLACK UI THEME
 # ============================================================
 
 st.markdown("""
 <style>
 
-/* Background */
+/* APP BACKGROUND */
+
 .stApp{
-background-color:#0a0a0a;
+background-color:#070707;
 color:white;
 }
 
-/* Title */
+/* TITLE */
+
 .title{
 font-size:50px;
 font-weight:700;
@@ -53,45 +55,56 @@ background:linear-gradient(90deg,#ff0000,#ff4d4d);
 color:transparent;
 }
 
-/* Glass Card */
+/* GLASS PANEL */
+
 .glass{
-background:rgba(20,20,20,0.9);
+background:linear-gradient(145deg,#141414,#0f0f0f);
 padding:25px;
-border-radius:15px;
-border:1px solid #ff0000;
-box-shadow:0px 0px 20px rgba(255,0,0,0.5);
+border-radius:16px;
+box-shadow:0px 0px 25px rgba(255,0,0,0.45);
 }
 
-/* Metric Card */
+/* METRIC CARD */
+
 .metric-card{
-background:#111;
+background:linear-gradient(145deg,#1a1a1a,#111111);
 padding:20px;
-border-radius:12px;
+border-radius:14px;
 text-align:center;
-border:1px solid #ff0000;
-box-shadow:0px 0px 15px rgba(255,0,0,0.3);
+box-shadow:0px 0px 20px rgba(255,0,0,0.4);
 }
 
 .metric-value{
-font-size:28px;
-font-weight:600;
-color:#ff3b3b;
+font-size:30px;
+font-weight:700;
+color:#ff4d4d;
 }
 
-/* Buttons */
+/* BUTTONS */
+
 .stButton>button{
 background-color:#1f6feb;
 color:white;
-border:none;
 border-radius:8px;
 padding:10px 20px;
+border:none;
 font-weight:600;
-box-shadow:0px 0px 10px rgba(255,0,0,0.7);
+box-shadow:0px 0px 12px rgba(255,0,0,0.6);
 }
 
 .stButton>button:hover{
 background-color:#3b82f6;
 box-shadow:0px 0px 20px rgba(255,0,0,1);
+}
+
+/* EXPLANATION BOX */
+
+.explain-box{
+background:#111;
+padding:20px;
+border-radius:12px;
+margin-bottom:15px;
+box-shadow:0px 0px 15px rgba(255,0,0,0.3);
 }
 
 </style>
@@ -124,7 +137,9 @@ if st.session_state.page == "landing":
 
     st.markdown("""
     <div class="glass">
-    Explore global space missions and simulate rocket physics.
+    Explore real mission data and understand the physics of rocket launches.
+    This dashboard combines simulation with real mission analysis to study
+    payload, thrust, drag and rocket performance.
     </div>
     """, unsafe_allow_html=True)
 
@@ -215,22 +230,6 @@ if st.session_state.page == "dashboard":
     df = df.fillna(method="ffill")
 
     # ============================================================
-    # SUCCESS FLAG
-    # ============================================================
-
-    status_col = None
-
-    for col in df.columns:
-        if "success" in col.lower():
-            status_col = col
-            break
-
-    if status_col:
-        df["Success_Flag"] = df[status_col]
-    else:
-        df["Success_Flag"] = 1
-
-    # ============================================================
     # SIDEBAR CONTROLS
     # ============================================================
 
@@ -257,7 +256,7 @@ if st.session_state.page == "dashboard":
         Total Missions
         <div class="metric-value">{total_missions}</div>
         </div>
-        """,unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
     with col2:
         st.markdown(f"""
@@ -265,7 +264,7 @@ if st.session_state.page == "dashboard":
         Payload
         <div class="metric-value">{payload} kg</div>
         </div>
-        """,unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
     with col3:
         efficiency = thrust/fuel
@@ -274,7 +273,7 @@ if st.session_state.page == "dashboard":
         Efficiency
         <div class="metric-value">{efficiency:.2f}</div>
         </div>
-        """,unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
     # ============================================================
     # TABS
@@ -328,8 +327,7 @@ if st.session_state.page == "dashboard":
             fig = px.scatter(
             df,
             x=numeric.columns[0],
-            y=numeric.columns[1],
-            color="Success_Flag"
+            y=numeric.columns[1]
             )
 
             fig.update_layout(template="plotly_dark")
@@ -405,46 +403,39 @@ if st.session_state.page == "dashboard":
 
     with tab7:
 
-        st.title("Rocket Physics Concepts")
+        st.markdown("<div class='explain-box'><b>Newton’s Second Law</b><br>"
+        "Force = Mass × Acceleration. Rockets accelerate upward when thrust "
+        "overcomes gravity and drag. As fuel burns, rocket mass decreases "
+        "which increases acceleration.</div>", unsafe_allow_html=True)
 
-        st.subheader("Newton’s Second Law")
+        st.markdown("<div class='explain-box'><b>Thrust</b><br>"
+        "Thrust is the force produced by rocket engines when fuel gases are "
+        "expelled at high velocity. According to Newton's Third Law, pushing "
+        "gases downward produces an equal upward force that lifts the rocket."
+        "</div>", unsafe_allow_html=True)
 
-        st.write("""
-        Force = Mass × Acceleration.
-        Rockets accelerate upward only when thrust is greater
-        than gravity and drag forces.
-        """)
+        st.markdown("<div class='explain-box'><b>Drag</b><br>"
+        "Drag is air resistance opposing rocket motion. Drag depends on "
+        "speed, air density and rocket shape. Engineers design rockets "
+        "to be aerodynamic to reduce drag.</div>", unsafe_allow_html=True)
 
-        st.subheader("Thrust")
+        st.markdown("<div class='explain-box'><b>Payload</b><br>"
+        "Payload is the cargo carried by the rocket such as satellites "
+        "or astronauts. Increasing payload increases rocket mass and "
+        "requires greater thrust and fuel.</div>", unsafe_allow_html=True)
 
-        st.write("""
-        Thrust is the force produced by rocket engines when fuel
-        is expelled downward, pushing the rocket upward.
-        """)
-
-        st.subheader("Drag")
-
-        st.write("""
-        Drag is air resistance acting against the rocket as it
-        moves through the atmosphere.
-        """)
-
-        st.subheader("Payload")
-
-        st.write("""
-        Payload is the cargo carried by the rocket such as
-        satellites or astronauts.
-        """)
-
-        st.subheader("Guiding Questions")
-
-        st.markdown("""
-        - How does adding more payload affect altitude?
-        - How does increasing thrust affect launch success?
-        - Does lower drag improve rocket speed?
-        - How long would it take to reach orbit?
-        - Can simulation values be compared with real mission data?
-        """)
+        st.markdown("<div class='explain-box'><b>Guiding Questions + Answers</b><br>"
+        "<b>How does adding payload affect altitude?</b><br>"
+        "More payload increases rocket mass which reduces acceleration "
+        "and lowers achievable altitude.<br><br>"
+        "<b>How does increasing thrust affect launch success?</b><br>"
+        "Higher thrust increases acceleration and helps rockets overcome "
+        "gravity and drag.<br><br>"
+        "<b>Does lower drag improve speed?</b><br>"
+        "Yes. Lower drag allows rockets to maintain higher velocities.<br><br>"
+        "<b>How long to reach orbit?</b><br>"
+        "Most rockets reach orbit within about 8-12 minutes after launch."
+        "</div>", unsafe_allow_html=True)
 
     # ============================================================
     # SETTINGS
