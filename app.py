@@ -31,41 +31,67 @@ if "user" not in st.session_state:
     st.session_state.user = None
 
 # ============================================================
-# CUSTOM CSS
+# RED BLACK UI
 # ============================================================
 
 st.markdown("""
 <style>
 
+/* Background */
+.stApp{
+background-color:#0a0a0a;
+color:white;
+}
+
+/* Title */
 .title{
 font-size:50px;
 font-weight:700;
 text-align:center;
-background:linear-gradient(90deg,#00ffd5,#00aaff);
+background:linear-gradient(90deg,#ff0000,#ff4d4d);
 -webkit-background-clip:text;
 color:transparent;
 }
 
+/* Glass Card */
 .glass{
-background:rgba(255,255,255,0.05);
+background:rgba(20,20,20,0.9);
 padding:25px;
 border-radius:15px;
-border:1px solid rgba(255,255,255,0.1);
-backdrop-filter:blur(10px);
+border:1px solid #ff0000;
+box-shadow:0px 0px 20px rgba(255,0,0,0.5);
 }
 
+/* Metric Card */
 .metric-card{
-background:rgba(255,255,255,0.05);
+background:#111;
 padding:20px;
 border-radius:12px;
 text-align:center;
-border:1px solid rgba(255,255,255,0.1);
+border:1px solid #ff0000;
+box-shadow:0px 0px 15px rgba(255,0,0,0.3);
 }
 
 .metric-value{
 font-size:28px;
 font-weight:600;
-color:#00ffd5;
+color:#ff3b3b;
+}
+
+/* Buttons */
+.stButton>button{
+background-color:#1f6feb;
+color:white;
+border:none;
+border-radius:8px;
+padding:10px 20px;
+font-weight:600;
+box-shadow:0px 0px 10px rgba(255,0,0,0.7);
+}
+
+.stButton>button:hover{
+background-color:#3b82f6;
+box-shadow:0px 0px 20px rgba(255,0,0,1);
 }
 
 </style>
@@ -184,31 +210,25 @@ if st.session_state.page == "dashboard":
         st.error("Dataset not found")
         st.stop()
 
-    # ============================================================
-    # DATA CLEANING
-    # ============================================================
-
     df.columns = df.columns.str.strip()
     df = df.drop_duplicates()
     df = df.fillna(method="ffill")
 
     # ============================================================
-    # SUCCESS FLAG (SAFE)
+    # SUCCESS FLAG
     # ============================================================
 
     status_col = None
 
     for col in df.columns:
-        if "status" in col.lower():
+        if "success" in col.lower():
             status_col = col
             break
 
     if status_col:
-        df["Success_Flag"] = df[status_col].astype(str).str.contains(
-            "success", case=False, na=False
-        ).astype(int)
+        df["Success_Flag"] = df[status_col]
     else:
-        df["Success_Flag"] = 0
+        df["Success_Flag"] = 1
 
     # ============================================================
     # SIDEBAR CONTROLS
@@ -216,21 +236,20 @@ if st.session_state.page == "dashboard":
 
     st.sidebar.title("Simulation Controls")
 
-    payload = st.sidebar.slider("Payload Weight (kg)", 100, 10000, 2000)
-    thrust = st.sidebar.slider("Rocket Thrust (kN)", 1000, 10000, 4000)
-    fuel = st.sidebar.slider("Fuel Amount (tons)", 50, 1000, 300)
-    drag = st.sidebar.slider("Drag Coefficient", 0.1, 1.5, 0.5)
-    burn = st.sidebar.slider("Fuel Burn Rate", 1, 50, 10)
-    steps = st.sidebar.slider("Simulation Steps", 50, 500, 200)
+    payload = st.sidebar.slider("Payload Weight (kg)",100,10000,2000)
+    thrust = st.sidebar.slider("Rocket Thrust (kN)",1000,10000,4000)
+    fuel = st.sidebar.slider("Fuel Amount (tons)",50,1000,300)
+    drag = st.sidebar.slider("Drag Coefficient",0.1,1.5,0.5)
+    burn = st.sidebar.slider("Fuel Burn Rate",1,50,10)
+    steps = st.sidebar.slider("Simulation Steps",50,500,200)
 
     # ============================================================
     # METRICS
     # ============================================================
 
     total_missions = len(df)
-    success_rate = df["Success_Flag"].mean() * 100
 
-    col1,col2,col3,col4 = st.columns(4)
+    col1,col2,col3 = st.columns(3)
 
     with col1:
         st.markdown(f"""
@@ -238,8 +257,7 @@ if st.session_state.page == "dashboard":
         Total Missions
         <div class="metric-value">{total_missions}</div>
         </div>
-        """, unsafe_allow_html=True)
-
+        """,unsafe_allow_html=True)
 
     with col2:
         st.markdown(f"""
@@ -247,33 +265,34 @@ if st.session_state.page == "dashboard":
         Payload
         <div class="metric-value">{payload} kg</div>
         </div>
-        """, unsafe_allow_html=True)
+        """,unsafe_allow_html=True)
 
     with col3:
-        efficiency = thrust / fuel
+        efficiency = thrust/fuel
         st.markdown(f"""
         <div class="metric-card">
         Efficiency
         <div class="metric-value">{efficiency:.2f}</div>
         </div>
-        """, unsafe_allow_html=True)
+        """,unsafe_allow_html=True)
 
     # ============================================================
     # TABS
     # ============================================================
 
-    tab1,tab2,tab3,tab4,tab5,tab6,tab7 = st.tabs([
-        "🚀 Simulation",
-        "📊 Scatter",
-        "📈 Line",
-        "📊 Bar",
-        "📦 Box",
-        "🔥 Heatmap",
-        "⚙ Settings"
+    tab1,tab2,tab3,tab4,tab5,tab6,tab7,tab8 = st.tabs([
+    "🚀 Simulation",
+    "📊 Scatter",
+    "📈 Line",
+    "📊 Bar",
+    "📦 Box",
+    "🔥 Heatmap",
+    "📚 Data Explanation",
+    "⚙ Settings"
     ])
 
     # ============================================================
-    # TAB 1 — SIMULATION
+    # SIMULATION
     # ============================================================
 
     with tab1:
@@ -283,37 +302,34 @@ if st.session_state.page == "dashboard":
         drag_force = drag*100
 
         altitudes, velocities = rocket_simulation(
-            thrust_force, mass, drag_force, burn, steps
-        )
+        thrust_force,mass,drag_force,burn,steps)
 
         fig = go.Figure()
 
         fig.add_trace(go.Scatter(y=altitudes,name="Altitude"))
 
-        fig.update_layout(template="plotly_dark",title="Altitude vs Time")
+        fig.update_layout(
+        template="plotly_dark",
+        title="Altitude vs Time"
+        )
 
         st.plotly_chart(fig,use_container_width=True)
-        st.write(" c  sd ds sd s ")
-
 
     # ============================================================
-    # TAB 2 — SCATTER
+    # SCATTER
     # ============================================================
 
     with tab2:
-
-        st.subheader("Payload vs Fuel Consumption")
-
 
         numeric = df.select_dtypes(include=np.number)
 
         if len(numeric.columns)>=2:
 
             fig = px.scatter(
-                df,
-                x=numeric.columns[0],
-                y=numeric.columns[1],
-                color="Success_Flag"
+            df,
+            x=numeric.columns[0],
+            y=numeric.columns[1],
+            color="Success_Flag"
             )
 
             fig.update_layout(template="plotly_dark")
@@ -321,17 +337,32 @@ if st.session_state.page == "dashboard":
             st.plotly_chart(fig,use_container_width=True)
 
     # ============================================================
-    # TAB 3 — LINE
+    # LINE
     # ============================================================
 
     with tab3:
-        st.subheader("Mission Duration vs Distance from Earth")
 
         numeric = df.select_dtypes(include=np.number)
 
-        fig = px.line(
-            df,
-            y=numeric.columns[0]
+        fig = px.line(df,y=numeric.columns[0])
+
+        fig.update_layout(template="plotly_dark")
+
+        st.plotly_chart(fig,use_container_width=True)
+
+    # ============================================================
+    # BAR
+    # ============================================================
+
+    with tab4:
+
+        counts = df["Launch Vehicle"].value_counts()
+
+        fig = px.bar(
+        x=counts.index,
+        y=counts.values,
+        labels={"x":"Launch Vehicle","y":"Number of Missions"},
+        title="Missions by Launch Vehicle"
         )
 
         fig.update_layout(template="plotly_dark")
@@ -339,41 +370,10 @@ if st.session_state.page == "dashboard":
         st.plotly_chart(fig,use_container_width=True)
 
     # ============================================================
-    # TAB 4 — BAR
-    # ============================================================
-
-    # ============================================================
-# TAB 4 — BAR CHART
-# ============================================================
-
-# ============================================================
-# TAB 4 — BAR CHART
-# ============================================================
-
-    with tab4:
-
-        st.subheader("Launch Vehicles Used")
-
-        counts = df["Launch Vehicle"].value_counts()
-
-        fig = px.bar(
-        x=counts.index,
-        y=counts.values,
-        labels={"x": "Launch Vehicle", "y": "Number of Missions"},
-        title="Missions by Launch Vehicle"
-            )
-
-        fig.update_layout(template="plotly_dark")
-
-        st.plotly_chart(fig, use_container_width=True)
-
-    # ============================================================
-    # TAB 5 — BOX
+    # BOX
     # ============================================================
 
     with tab5:
-        st.subheader("Crew Size vs Mission Success")
-
 
         numeric = df.select_dtypes(include=np.number)
 
@@ -384,12 +384,10 @@ if st.session_state.page == "dashboard":
         st.plotly_chart(fig,use_container_width=True)
 
     # ============================================================
-    # TAB 6 — HEATMAP
+    # HEATMAP
     # ============================================================
 
     with tab6:
-        st.subheader("Heat Map")
-
 
         numeric = df.select_dtypes(include=np.number)
 
@@ -402,14 +400,61 @@ if st.session_state.page == "dashboard":
         st.plotly_chart(fig,use_container_width=True)
 
     # ============================================================
-    # TAB 7 — SETTINGS
+    # DATA EXPLANATION
     # ============================================================
 
     with tab7:
 
+        st.title("Rocket Physics Concepts")
+
+        st.subheader("Newton’s Second Law")
+
+        st.write("""
+        Force = Mass × Acceleration.
+        Rockets accelerate upward only when thrust is greater
+        than gravity and drag forces.
+        """)
+
+        st.subheader("Thrust")
+
+        st.write("""
+        Thrust is the force produced by rocket engines when fuel
+        is expelled downward, pushing the rocket upward.
+        """)
+
+        st.subheader("Drag")
+
+        st.write("""
+        Drag is air resistance acting against the rocket as it
+        moves through the atmosphere.
+        """)
+
+        st.subheader("Payload")
+
+        st.write("""
+        Payload is the cargo carried by the rocket such as
+        satellites or astronauts.
+        """)
+
+        st.subheader("Guiding Questions")
+
+        st.markdown("""
+        - How does adding more payload affect altitude?
+        - How does increasing thrust affect launch success?
+        - Does lower drag improve rocket speed?
+        - How long would it take to reach orbit?
+        - Can simulation values be compared with real mission data?
+        """)
+
+    # ============================================================
+    # SETTINGS
+    # ============================================================
+
+    with tab8:
+
         if st.button("Sign Out"):
-            st.session_state.page = "landing"
-            st.session_state.user = None
+            st.session_state.page="landing"
+            st.session_state.user=None
             st.rerun()
 
     # ============================================================
