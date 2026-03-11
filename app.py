@@ -240,15 +240,8 @@ if st.session_state.page == "dashboard":
         </div>
         """, unsafe_allow_html=True)
 
-    with col2:
-        st.markdown(f"""
-        <div class="metric-card">
-        Success Rate
-        <div class="metric-value">{success_rate:.2f}%</div>
-        </div>
-        """, unsafe_allow_html=True)
 
-    with col3:
+    with col2:
         st.markdown(f"""
         <div class="metric-card">
         Payload
@@ -256,7 +249,7 @@ if st.session_state.page == "dashboard":
         </div>
         """, unsafe_allow_html=True)
 
-    with col4:
+    with col3:
         efficiency = thrust / fuel
         st.markdown(f"""
         <div class="metric-card">
