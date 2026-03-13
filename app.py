@@ -109,6 +109,40 @@ box-shadow:0px 0px 15px rgba(255,0,0,0.3);
 
 </style>
 """, unsafe_allow_html=True)
+# ============================================================
+# INSIGHT BOX STYLE
+# ============================================================
+
+st.markdown("""
+<style>
+
+.insight-box {
+    border: 2px solid #00f7ff;
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 10px;
+    background: rgba(0,0,0,0.6);
+    box-shadow: 0 0 15px #00f7ff;
+    color: white;
+    font-size: 16px;
+}
+
+.insight-title {
+    color: #00f7ff;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+def show_insight(text):
+    st.markdown(f"""
+    <div class="insight-box">
+        <div class="insight-title">🔎 Insight</div>
+        {text}
+    </div>
+    """, unsafe_allow_html=True)
 
 # ============================================================
 # SPLASH SCREEN
@@ -313,6 +347,11 @@ if st.session_state.page == "dashboard":
         )
 
         st.plotly_chart(fig,use_container_width=True)
+        show_insight(
+"The rocket altitude increases as thrust overcomes gravity and drag. "
+"During the simulation, fuel burn reduces rocket mass which increases "
+"acceleration and allows the rocket to reach higher altitudes."
+)
 
     # ============================================================
     # SCATTER
@@ -333,6 +372,11 @@ if st.session_state.page == "dashboard":
             fig.update_layout(template="plotly_dark")
 
             st.plotly_chart(fig,use_container_width=True)
+            show_insight(
+"Scatter plots help identify relationships between mission variables. "
+"For example, missions with larger payloads often require more fuel "
+"and higher thrust to successfully launch."
+)
 
     # ============================================================
     # LINE
@@ -347,6 +391,11 @@ if st.session_state.page == "dashboard":
         fig.update_layout(template="plotly_dark")
 
         st.plotly_chart(fig,use_container_width=True)
+        show_insight(
+"Line charts reveal trends across missions. Changes in values may "
+"indicate improvements in technology, mission efficiency, or "
+"variations in mission complexity."
+)
 
     # ============================================================
     # BAR
@@ -366,6 +415,11 @@ if st.session_state.page == "dashboard":
         fig.update_layout(template="plotly_dark")
 
         st.plotly_chart(fig,use_container_width=True)
+        show_insight(
+"This bar chart shows how frequently each launch vehicle is used. "
+"Vehicles with more launches often represent reliable or commonly "
+"used rockets in space missions."
+)
 
     # ============================================================
     # BOX
@@ -380,6 +434,11 @@ if st.session_state.page == "dashboard":
         fig.update_layout(template="plotly_dark")
 
         st.plotly_chart(fig,use_container_width=True)
+        show_insight(
+"Box plots highlight the distribution of mission values and reveal "
+"outliers. Large variations indicate missions with significantly "
+"different characteristics compared to the average."
+)
 
     # ============================================================
     # HEATMAP
@@ -396,6 +455,11 @@ if st.session_state.page == "dashboard":
         fig.update_layout(template="plotly_dark")
 
         st.plotly_chart(fig,use_container_width=True)
+        show_insight(
+"The correlation heatmap highlights relationships between numerical "
+"mission parameters. Strong correlations suggest that certain factors "
+"such as payload, fuel consumption, and mission cost are closely related."
+)
 
     # ============================================================
     # DATA EXPLANATION
